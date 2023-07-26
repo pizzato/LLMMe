@@ -98,7 +98,7 @@ def get_label_id_for_botlabel(service, botname):
             return label["id"]
 
     # if it gets here, it needs to create
-    label = service.users().labels().list(userId='me', body=dict(name=botname)).execute()
+    label = service.users().labels().create(userId='me', body=dict(name=botname)).execute()
     return label['id']
 
 

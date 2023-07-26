@@ -15,6 +15,7 @@ import config
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/gmail.modify']
 
+
 def get_credentials():
     creds = None
 
@@ -38,6 +39,7 @@ def get_credentials():
 
     return creds
 
+
 def get_service():
     creds = get_credentials()
 
@@ -47,8 +49,9 @@ def get_service():
     except HttpError as error:
         print(F'An error occurred: {error}')
 
-def gmail_create_draft(service, f_from, f_to, f_subject, f_in_reply_to, f_references, f_thread_id, f_message_id, f_answer, botlabel_id):
 
+def gmail_create_draft(service, f_from, f_to, f_subject, f_in_reply_to, f_references, f_thread_id, f_message_id,
+                       f_answer, botlabel_id):
     print(f"Creating draft: {f_subject}")
     try:
         message = EmailMessage()
@@ -67,7 +70,7 @@ def gmail_create_draft(service, f_from, f_to, f_subject, f_in_reply_to, f_refere
 
         create_message = {
             'message': {
-                'threadId' : f_thread_id,
+                'threadId': f_thread_id,
                 'raw': encoded_message
             }
         }
@@ -98,6 +101,7 @@ def get_label_id_for_botlabel(service, botname):
     label = service.users().labels().list(userId='me', body=dict(name=botname)).execute()
     return label['id']
 
+
 def gmail_get_unread(service, botname):
     print("gmail_get_unread")
     try:
@@ -105,20 +109,22 @@ def gmail_get_unread(service, botname):
 
         messages_raw = []
         while True:
-            messages_raw += [service.users().messages().get(userId="me",id=m['id']).execute() for m in inbox.get('messages',[])]
+            messages_raw += [service.users().messages().get(userId="me", id=m['id']).execute() for m in
+                             inbox.get('messages', [])]
             if 'pageToken' in inbox:
-                inbox = service.users().messages().list(userId="me", q='in:inbox', pageToken=inbox['pageToken']).execute() # untested
+                inbox = service.users().messages().list(userId="me", q='in:inbox',
+                                                        pageToken=inbox['pageToken']).execute()  # untested
             else:
                 break
-
 
         messages = []
         for mraw in messages_raw:
             payload = mraw['payload']
-            message = {d['name']:d['value'] for d in payload['headers'] if d['name'] in ['From', 'To', 'Cc', 'Subject', 'Content-Type', 'Message-ID', 'References']}
+            message = {d['name']: d['value'] for d in payload['headers'] if
+                       d['name'] in ['From', 'To', 'Cc', 'Subject', 'Content-Type', 'Message-ID', 'References']}
 
             body_message = ""
-            if (payload['body']['size'] != 0) and (message['Content-Type'].contains('text/plain')):
+            if (payload['body']['size'] != 0) and ('text/plain' in message['Content-Type']):
                 body_message = payload['body']['data']
             elif 'parts' in payload and len(payload['parts']) > 0:
                 for part in payload['parts']:
@@ -131,7 +137,7 @@ def gmail_get_unread(service, botname):
             message['Body'] = body_message
             message.pop('Content-Type')
 
-            message['threadId'] = mraw.get('threadId','')
+            message['threadId'] = mraw.get('threadId', '')
             message['id'] = mraw.get('id')
             messages.append(message)
 
@@ -140,4 +146,3 @@ def gmail_get_unread(service, botname):
     except HttpError as error:
         print(F'An error occurred: {error}')
         return []
-

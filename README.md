@@ -41,3 +41,6 @@ It searches for all unread messages in your inbox that have not being previously
 
 In order not to redo messages, the program creates a tag with the name of your bot (e.g. "LLMMe" as in `config.py`) and tags all emails that it has created a draft for already. 
 
+### Troubleshoot
+
+For Mac M1/M2 as indicated in (https://github.com/pytorch/pytorch/issues/96610), run `pip3 install --upgrade --no-deps --force-reinstall --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cpu`.

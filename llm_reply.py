@@ -1,3 +1,4 @@
+import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 import config
@@ -14,6 +15,11 @@ model = AutoModelForCausalLM.from_pretrained(
     trust_remote_code=True,
 )
 
+device = 'cuda' if torch.cuda.is_available() else \
+         'mps' if torch.backends.mps.is_available() else \
+         'cpu'
+
+
 def respond(f_from, f_to, f_cc, f_subject, f_context):
     """
         Query the LLM
@@ -26,10 +32,10 @@ def respond(f_from, f_to, f_cc, f_subject, f_context):
     :return:
     """
     print(f"Bot Respond to {f_subject}")
-    model.cuda().eval()
+
     message = config.prompt_format_with_markers.format(f_from=f_from, f_to=f_to, f_cc=f_cc, f_subject=f_subject, f_context=f_context)
 
-    inputs = tokenizer(message, return_tensors="pt", add_special_tokens=False).to("cuda")
+    inputs = tokenizer(message, return_tensors="pt", add_special_tokens=False).to(device)
 
     # generate configuration can be modified to your needs
     tokens = model.generate(
@@ -54,7 +60,7 @@ def gradio_app():
     """
     import gradio as gr
 
-    with gr.Blocks() as demo:
+    with gr.Blocks(title='LLMMe') as demo:
         f_from = gr.Textbox(value=config.my_email, label="From: ")
         f_to = gr.Textbox(label="To: ")
         f_cc = gr.Textbox(label="Cc: ")

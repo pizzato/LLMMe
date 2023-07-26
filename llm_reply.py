@@ -3,21 +3,23 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 import config
 
+device = 'cuda' if torch.cuda.is_available() else \
+         'mps' if torch.backends.mps.is_available() else \
+         'cpu'
+
 tokenizer = AutoTokenizer.from_pretrained(
     config.model_name,
     use_fast=False,
-    trust_remote_code=True,
+    trust_remote_code=True
 )
+
 model = AutoModelForCausalLM.from_pretrained(
     config.model_name,
     torch_dtype="auto",
     device_map="auto",
-    trust_remote_code=True,
+    trust_remote_code=True
 )
 
-device = 'cuda' if torch.cuda.is_available() else \
-         'mps' if torch.backends.mps.is_available() else \
-         'cpu'
 
 
 def respond(f_from, f_to, f_cc, f_subject, f_context):
@@ -33,7 +35,7 @@ def respond(f_from, f_to, f_cc, f_subject, f_context):
     """
     print(f"Bot Respond to {f_subject}")
 
-    message = config.prompt_format_with_markers.format(f_from=f_from, f_to=f_to, f_cc=f_cc, f_subject=f_subject, f_context=f_context)
+    message = config.prompt_format_with_markers.format(f_from=f_from, f_to=f_to, f_cc=f_cc, f_subject=f_subject, f_context=f_context[:config.max_context_length_chars])
 
     inputs = tokenizer(message, return_tensors="pt", add_special_tokens=False).to(device)
 

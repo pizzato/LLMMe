@@ -7,6 +7,8 @@ botname = "LLMMe"
 my_name = "My Name"
 my_email = "my_email@gmail.com"
 
+max_context_length_chars = 2000
+
 response_template = f"""
 
 =====================================================================

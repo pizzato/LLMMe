@@ -12,7 +12,7 @@ def main():
         messages = email_api.gmail_get_unread(service, botname=config.botname)
         # call model and respond
         for m in messages:
-            f_from, f_to, f_cc, f_subject = m.get('To', config.my_email), m['From'], m['Cc'], m['Subject']
+            f_from, f_to, f_cc, f_subject = m.get('To', config.my_email), m['From'], m.get('Cc',''), m['Subject']
             f_in_reply_to = m.get('Message-ID')
             f_references = m.get('References', f_in_reply_to)
             f_thread_id = m.get('threadId')

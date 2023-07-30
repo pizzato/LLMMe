@@ -135,7 +135,8 @@ def gmail_get_unread(service, botname):
                 body_message = base64.urlsafe_b64decode(body_message).decode()
 
             message['Body'] = body_message
-            message.pop('Content-Type')
+            if 'Content-Type' in message:
+                message.pop('Content-Type')
 
             message['threadId'] = mraw.get('threadId', '')
             message['id'] = mraw.get('id')

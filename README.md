@@ -44,3 +44,7 @@ In order not to redo messages, the program creates a tag with the name of your b
 ### Troubleshoot
 
 For Mac M1/M2 as indicated in (https://github.com/pytorch/pytorch/issues/96610), run `pip3 install --upgrade --no-deps --force-reinstall --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cpu`.
+
+### Add to crontab
+
+On a Mac or Linux, just add your program to a cron job. Mine run every 1 hour!

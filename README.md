@@ -26,7 +26,7 @@ options:
 
 4. After the CSV file is created use any LLM training tool that generates an LLM compatible with [AutoModelForCausalLM](https://huggingface.co/transformers/v3.5.1/model_doc/auto.html#automodelforcausallm)
 
-    Personally, I use [H2O's LLM Studio](https://github.com/h2oai/h2o-llmstudio) because it's a very easy to do import datasets and train an LLM on top of foundational models. 
+    Personally, I use [H2O's LLM Studio](https://github.com/h2oai/h2o-llmstudio) because it's a very easy to import datasets and train an LLM on top of foundational models. 
     My personal model was successfully trained using an RTX 4080 with more than 100K email in about an hour per epoch using [/facebook/opt-2.7b](https://huggingface.co/facebook/opt-2.7b).
 5. After having your model at hand. Go play with it for a bit. Change the variables to your liking on `config.py`. Specifically you need to define which model you are using here. This is your personal model directory or hugging face space/model format in case you have it uploaded there.
 

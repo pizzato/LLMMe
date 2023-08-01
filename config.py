@@ -7,20 +7,20 @@ botname = "LLMMe"
 my_name = "My Name"
 my_email = "my_email@gmail.com"
 
-max_context_length_chars = 2000
+max_context_length_chars = 1500
 
 response_template = f"""
-
-=====================================================================
-The response below was created automatically with {botname}
-using an LLM trained with my emails. Thanks {my_name}
-=====================================================================
-{botname} Reply:
----
 
 {{}}
 
 ---
+==============
+The response above was created automatically with {botname} using an LLM trained with my emails. 
+
+Thanks {my_name}
+
+Check out the project at: https://github.com/pizzato/LLMMe
+==============
 """
 
 # You probably don't need to change this, unless you want to do something different

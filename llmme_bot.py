@@ -18,10 +18,14 @@ def main():
             f_thread_id = m.get('threadId')
             f_message_id = m.get('id')
             f_answer = llm_reply.respond(f_from=f_from, f_to=f_to, f_cc=f_cc, f_subject=f_subject, f_context=m['Body'])
-            email_api.gmail_create_draft(service, f_from=f_from, f_to=f_to, f_subject=f_subject,
-                                         f_in_reply_to=f_in_reply_to, f_references=f_references,
-                                         f_thread_id=f_thread_id, f_message_id=f_message_id,
-                                         f_answer=f_answer, botlabel_id=botlabel_id)
+
+            created_message = email_api.gmail_create_message(f_from=f_from, f_to=f_to, f_subject=f_subject,
+                                                             f_in_reply_to=f_in_reply_to, f_references=f_references,
+                                                             f_thread_id=f_thread_id, f_answer=f_answer)
+
+            email_api.post_draft_or_reply_message(service=service, created_message=created_message,
+                                                  f_message_id=f_message_id, botlabel_id=botlabel_id,
+                                                  reply_automatically=config.reply_automatically)
 
     except email_api.HttpError as error:
         print(F'An error occurred: {error}')

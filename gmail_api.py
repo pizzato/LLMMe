@@ -50,43 +50,46 @@ def get_service():
         print(F'An error occurred: {error}')
 
 
-def gmail_create_draft(service, f_from, f_to, f_subject, f_in_reply_to, f_references, f_thread_id, f_message_id,
-                       f_answer, botlabel_id):
-    print(f"Creating draft: {f_subject}")
-    try:
-        message = EmailMessage()
+def gmail_create_message(f_from, f_to, f_subject, f_in_reply_to, f_references, f_thread_id, f_answer):
+    print(f"Creating message: {f_subject}")
+    message = EmailMessage()
 
-        message.set_content(config.response_template.format(f_answer))
+    message.set_content(config.response_template.format(f_answer))
 
-        message['To'] = f_to
-        message['From'] = f_from
-        message['Subject'] = f_subject
-        message['In-Reply-To'] = f_in_reply_to
-        message['References'] = f_references
-        message['threadId'] = f_thread_id
+    message['To'] = f_to
+    message['From'] = f_from
+    message['Subject'] = f_subject
+    message['In-Reply-To'] = f_in_reply_to
+    message['References'] = f_references
+    message['threadId'] = f_thread_id
 
-        # encoded message
-        encoded_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
+    # encoded message
+    encoded_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
 
-        create_message = {
-            'message': {
-                'threadId': f_thread_id,
-                'raw': encoded_message
-            }
+    created_message = {
+        'message': {
+            'threadId': f_thread_id,
+            'raw': encoded_message
         }
-        # pylint: disable=E1101
-        draft = service.users().drafts().create(userId="me",
-                                                body=create_message).execute()
+    }
 
-        print(F'Draft id: {draft["id"]}\nDraft message: {draft["message"]}')
+    return created_message
+
+
+def post_draft_or_reply_message(service, created_message, f_message_id, botlabel_id, reply_automatically=False):
+    try:
+        message = service.users().drafts().create(userId="me", body=created_message).execute()
+        print(F'Created Draft id: {message["id"]}\nDraft message: {message["message"]}')
 
         service.users().messages().modify(userId="me", id=f_message_id, body=dict(addLabelIds=[botlabel_id])).execute()
 
+        if reply_automatically:
+            print("Sending draft")
+            service.users().drafts().send(userId="me", body=message).execute()
+
+
     except HttpError as error:
         print(F'An error occurred: {error}')
-        draft = None
-
-    return draft
 
 
 def get_label_id_for_botlabel(service, botname):

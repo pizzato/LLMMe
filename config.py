@@ -9,18 +9,20 @@ my_email = "my_email@gmail.com"
 
 max_context_length_chars = 1500
 
+# Setting reply_automatically to true is discourage as the bot will always send the reply and won't create a draft
+reply_automatically = False
+
 response_template = f"""
 
 {{}}
 
 ---
 ==============
-The response above was created automatically with {botname} using an LLM trained with my emails. 
+The response above created/sent by a bot using LLMMe. 
 
-Thanks {my_name}
+This was: {botname} responding for {my_name}
 
-Check out the project at: https://github.com/pizzato/LLMMe
-==============
+Check out the project at https://github.com/pizzato/LLMMe
 """
 
 # You probably don't need to change this, unless you want to do something different

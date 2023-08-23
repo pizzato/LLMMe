@@ -1,6 +1,8 @@
 import config
 import gmail_api as email_api
 import llm_reply
+import argparse
+import time
 
 def main():
     try:
@@ -31,4 +33,16 @@ def main():
         print(F'An error occurred: {error}')
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(description="Run LLMMe Bot")
+
+    parser.add_argument("-m", "--check_minutes", type=int, required=False, default=0, help="Check every M minutes. Defaults to 0 which means check only once.")
+
+    args, unknown = parser.parse_known_args()
+
+
+    while True:
+        print("Checking emails")
+        main()
+        time.sleep(60*args.check_minutes)
+        if args.check_minutes == 0:
+            break

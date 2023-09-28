@@ -30,7 +30,7 @@ def main():
                                                       created_message=created_message,
                                                       reply_automatically=config.reply_automatically)
 
-            email_api.mark_as_read_by_bot(service=service, f_message_id=f_message_id, botlabel_id=botlabel_id,)
+            email_api.mark_as_read_by_bot(service=service, f_message_id=f_message_id, botlabel_id=botlabel_id)
 
     except email_api.HttpError as error:
         print(F'An error occurred: {error}')

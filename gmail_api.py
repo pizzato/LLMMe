@@ -76,12 +76,13 @@ def gmail_create_message(f_from, f_to, f_subject, f_in_reply_to, f_references, f
     return created_message
 
 
-def post_draft_or_reply_message(service, created_message, f_message_id, botlabel_id, reply_automatically=False):
+def mark_as_read_by_bot(service, f_message_id, botlabel_id):
+    service.users().messages().modify(userId="me", id=f_message_id, body=dict(addLabelIds=[botlabel_id])).execute()
+
+def post_draft_or_reply_message(service, created_message, reply_automatically=False):
     try:
         message = service.users().drafts().create(userId="me", body=created_message).execute()
         print(F'Created Draft id: {message["id"]}\nDraft message: {message["message"]}')
-
-        service.users().messages().modify(userId="me", id=f_message_id, body=dict(addLabelIds=[botlabel_id])).execute()
 
         if reply_automatically:
             print("Sending draft")

@@ -26,16 +26,20 @@ def main():
                                                                  f_in_reply_to=f_in_reply_to, f_references=f_references,
                                                                  f_thread_id=f_thread_id, f_answer=f_answer)
 
-                email_api.post_draft_or_reply_message(service=service, created_message=created_message,
-                                                      f_message_id=f_message_id, botlabel_id=botlabel_id,
+                email_api.post_draft_or_reply_message(service=service,
+                                                      created_message=created_message,
                                                       reply_automatically=config.reply_automatically)
+
+            email_api.mark_as_read_by_bot(service=service, f_message_id=f_message_id, botlabel_id=botlabel_id,)
 
     except email_api.HttpError as error:
         print(F'An error occurred: {error}')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Run LLMMe Bot")
-
+    # parser.add_argument("-c", "--config", type=str, required=True, help="Config file (.py)")
+    # parser.add_argument("-a", "--credentials", type=str, required=True, help="Google API Credentials")
+    # parser.add_argument("-t", "--token", required=True, nargs='+', help="Google API Token")
     parser.add_argument("-m", "--check_minutes", type=int, required=False, default=0, help="Check every M minutes. Defaults to 0 which means check only once.")
 
     args, unknown = parser.parse_known_args()

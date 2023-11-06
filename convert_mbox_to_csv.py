@@ -107,15 +107,15 @@ def create_email_csv_dataset(mbox_filename:str, my_email_addresses:list, csv_fil
     logging.info(f"Dataset (total new emails  {len(messages_i_started)})")
 
     emails_i_started = [dict(replied_id=mess_id,
-                           reply_full_text=email_text_content[mess_id],
-                           reply_no_quote=email_text_content[mess_id],
-                           mess_full=config.prompt_format.format(f_from=emails[mess_id].get('From',''),
-                                                                 f_to=emails[mess_id].get('To',''),
-                                                                 f_cc=emails[mess_id].get('Cc',''),
-                                                                 f_subject=emails[mess_id].get('Subject',''),
-                                                                 f_context=""))
-                      for mess_id in messages_i_started.index
-                      ]
+                             reply_full_text=email_text_content[mess_id],
+                             reply_no_quote=email_text_content[mess_id],
+                             mess_full=config.prompt_format.format(f_from=emails[mess_id].get('From',''),
+                                                                   f_to=emails[mess_id].get('To',''),
+                                                                   f_cc=emails[mess_id].get('Cc',''),
+                                                                   f_subject=emails[mess_id].get('Subject',''),
+                                                                   f_context=""))
+                        for mess_id in messages_i_started.index
+                        ]
 
     # Getting emails that I have received
     messages_received = df[~df['From'].str.contains('|'.join(my_email_addresses), regex=True, na=False, case=False)]
@@ -127,21 +127,20 @@ def create_email_csv_dataset(mbox_filename:str, my_email_addresses:list, csv_fil
     messages_received_not_replied = messages_received[~messages_received.index.isin(all_replied_messages)]
 
     # Sample top N emails
-    messages_received_not_replied = messages_received_not_replied.sample(n=len(emails_replied) + len(emails_i_started))
+    messages_received_not_replied = messages_received_not_replied.sample(n=min(len(emails_replied) + len(emails_i_started), len(messages_received_not_replied)))
 
-    logging.info(f"Dataset (total emails received and not replied {len(messages_received_not_replied)})")
+    logging.info(f"Dataset (total emails received and not replied (sampled) {len(messages_received_not_replied)})")
 
     emails_received_not_replied = [dict(replied_id=mess_id,
-                                 reply_full_text="*[DO NOT REPLY]*",
-                                 reply_no_quote="*[DO NOT REPLY]*",
-                                 mess_full=config.prompt_format.format(f_from=emails[mess_id].get('To',''),
-                                                                       f_to=emails[mess_id].get('From',''),
-                                                                       f_cc=emails[mess_id].get('Cc',''),
-                                                                       f_subject=f"RE: {emails[mess_id].get('Subject','')}",
-                                                                       f_context=email_text_content[mess_id]))
-                            for mess_id in messages_received_not_replied.index
-                            ]
-
+                                        reply_full_text="*[DO NOT REPLY]*",
+                                        reply_no_quote="*[DO NOT REPLY]*",
+                                        mess_full=config.prompt_format.format(f_from=emails[mess_id].get('To',''),
+                                                                              f_to=emails[mess_id].get('From',''),
+                                                                              f_cc=emails[mess_id].get('Cc',''),
+                                                                              f_subject=f"RE: {emails[mess_id].get('Subject','')}",
+                                                                              f_context=email_text_content[mess_id]))
+                                   for mess_id in messages_received_not_replied.index
+                                   ]
 
     logging.info(f"Exporting {len(messages_i_started)+len(messages_i_replied_tuple)+len(emails_received_not_replied)} emails to CSV: {csv_file_output}")
     df_emails = pd.DataFrame(emails_replied + emails_i_started + emails_received_not_replied)

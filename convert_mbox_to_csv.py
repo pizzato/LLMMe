@@ -45,13 +45,14 @@ def remove_quoted_lines(text:str):
     # Join the lines back into a single string
     return '\n'.join(lines)
 
-def create_email_csv_dataset(mbox_filename:str, my_email_addresses:list, csv_file_output:str):
+def create_email_csv_dataset(mbox_filename:str, my_email_addresses:list, csv_file_output:str, start_date:str=None):
     """
     Create a CSV file with all emails composed by a list of email addresses from a mbox file
 
     :param mbox_filename: mbox filename
     :param my_email_addresses: list of email addresses
     :param csv_file_output: csv filename to output
+    :param start_date: start date of first email
     :return: None
     """
 
@@ -75,6 +76,17 @@ def create_email_csv_dataset(mbox_filename:str, my_email_addresses:list, csv_fil
     df = pd.DataFrame(emails_list, dtype=str)
     df['Content-Type'] = df['Content-Type'].str.split(';', expand=True, n=1)[0].str.lower()  # loses charset info
     df.set_index('Message-ID', inplace=True)
+
+    if start_date is not None:
+        logging.info(f"Filtering by date (emails after {start_date})")
+        # convert to datetime
+        df['Date'] = pd.to_datetime(df['Date'], format='%a, %d %b %Y %H:%M:%S %z', errors='coerce')
+        # pd.to_datetime(df['Date'], infer_datetime_format=True, errors='coerce')
+        # filter date
+        df = df[~df['Date'].isnull()].copy() # date format convertion failed
+        logging.info(f"Email with good date format ({len(df)})")
+        df = df[df['Date'] > pd.to_datetime(start_date, utc=True)].copy() # keep after certain date, UTC
+        logging.info(f"Email after {start_date}: {len(df)}")
 
     logging.info("Getting email content")
     email_text_content = {email.get('Message-ID'):get_email_text_content(email) for email in mb}
@@ -152,9 +164,10 @@ if __name__ == '__main__':
     parser.add_argument("-i", "--input", type=str, required=True, help="Mailbox file (.mbox)")
     parser.add_argument("-o", "--output", type=str, required=True, help="Output file (.csv)")
     parser.add_argument("-e", "--emails", required=True, nargs='+', help="List of senders emails (From)")
+    parser.add_argument("-s", "--start_date", type=str, required=False, help="Date of the first email", default=None)
 
     args, unknown = parser.parse_known_args()
 
-    create_email_csv_dataset(mbox_filename=args.input, my_email_addresses=args.emails, csv_file_output=args.output)
+    create_email_csv_dataset(mbox_filename=args.input, my_email_addresses=args.emails, csv_file_output=args.output, start_date=args.start_date)
 
     # example run python .\convert_mbox_to_csv.py -i 'All mail Including Spam and Trash.mbox' -o "my_emails.csv" -e email@gmail.com email2@gmail.com email3@gmail.com
